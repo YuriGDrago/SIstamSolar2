@@ -62,6 +62,22 @@ scene.add(light1);
 scene.add(light2);
 scene.add(light3);
 
+//Luzes pontuais desentralizadas
+const light4 = new THREE.PointLight(0xff0000, 1, 10);
+light4.position.set(-5, 5, 5);
+light4.intensity = 4.0;
+scene.add(light4);
+
+const light5 = new THREE.PointLight(0x00ff00, 1, 10);
+light5.position.set(5, -5, 5);
+light5.intensity = 5.5;
+scene.add(light5);
+
+const light6 = new THREE.PointLight(0x0000ff, 1, 10);
+light6.position.set(0, 0, 5);
+light6.intensity = 6.5;
+scene.add(light6);
+
 // Configurar o plano de fundo como uma cor sólida
 scene.background = new THREE.Color(0x0000ff);
 
