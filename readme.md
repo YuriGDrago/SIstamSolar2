@@ -56,7 +56,8 @@ Certifique-se de consultar a documentação da biblioteca Three.js para obter ma
 ## Demonstração
 
 Confira uma demonstração online deste exemplo no seguinte link: [Demo](https://sistema-solar-8d8zthx4a-yurigdrago.vercel.app)
-![Imagem Exemplo]([URL_da_imagem](https://imgur.com/UJNnlvb))
+![Descrição da imagem](https://i.imgur.com/UJNnlvb.png)
+
 
 
 ## Recursos adicionais
