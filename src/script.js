@@ -1,277 +1,144 @@
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
-import {Pane} from 'tweakpane';
-import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper.js'
-const PARAMS = {
-    visible: false,
-    checkVisible: () => {
-        if (PARAMS.visible){
-            hemisphereLightHelper.visible = true == hemisphereLight.visible 
-            directionalLightHelper.visible = true  == directionalLight.visible
-            pointLightHelper.visible = true == pointLight.visible
-            spotLightHelper.visible = true == spotLight.visible
-            rectAreaLightHelper.visible = true == rectAreaLight.visible
-        }
-    },
-    visibleLightHelper: () => {
-        if (PARAMS.visible){
-            hemisphereLightHelper.visible = true == hemisphereLight.visible 
-            directionalLightHelper.visible = true  == directionalLight.visible
-            pointLightHelper.visible = true == pointLight.visible
-            spotLightHelper.visible = true == spotLight.visible
-            rectAreaLightHelper.visible = true == rectAreaLight.visible
-        }else{
-            hemisphereLightHelper.visible = false    
-            directionalLightHelper.visible = false  
-            pointLightHelper.visible = false
-            spotLightHelper.visible = false
-            rectAreaLightHelper.visible = false
-        }
-        
-    },
-    download: () => {
-        const link = document.createElement('a');
-        link.download = 'download.png';
-        link.href = document.getElementById("myCanvas").toDataURL('image/png');
-        link.click()  
+import * as THREE from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
+
+// Criar a cena
+const scene = new THREE.Scene();
+
+// Criar a câmera
+const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+// Criar o renderizador
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
+
+// Adicionar controles do mouse para manipulação da câmera
+const controls = new OrbitControls(camera, renderer.domElement);
+
+// Adicionar redimensionamento da tela e suporte a tela cheia
+window.addEventListener('resize', () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'f') {
+    toggleFullScreen();
+  }
+});
+
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
     }
-  };
-
-const pane = new Pane();
-
-pane.addButton({
-    title: 'download'
-}).on("click",PARAMS.download)
-
-// Canvas
-const canvas = document.querySelector('canvas.webgl')
-
-// Scene
-const scene = new THREE.Scene()
-
-/**
- * Lights
- */
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.5)
-scene.add(ambientLight)
-pane.addInput(ambientLight, "intensity", {
-    label: "amb. level",
-    min: 0,
-    max: 1,
-    step: 0.001
-})
-
-pane.addInput(PARAMS, "visible",{
-    label: "show helpers"
-}).on("change",(ev)=>{
-    PARAMS.visibleLightHelper()
-})
-
-const directionalLight = new THREE.DirectionalLight(0x00fffc, 0.3)
-directionalLight.position.set(5, 2.5, 0.5)
-scene.add(directionalLight)
-directionalLight.visible = true
-directionalLight.castShadow = true
-directionalLight.shadow.mapSize.width = 1024
-directionalLight.shadow.mapSize.height = 1024
-directionalLight.shadow.camera.near = 3
-directionalLight.shadow.camera.far = 11
-directionalLight.shadow.camera.top = 2
-directionalLight.shadow.camera.right = 2
-directionalLight.shadow.camera.bottom = -2
-directionalLight.shadow.camera.left = -2
-
-const directionalLightCameraHelper = new THREE.CameraHelper(directionalLight.shadow.camera)
-scene.add(directionalLightCameraHelper)
-directionalLightCameraHelper.visible = false
-
-pane.addInput(directionalLight,"visible",{
-    "label": "luz direcional",
-}).on("change",(ev)=>{
-    PARAMS.checkVisible()
-})
-
-const hemisphereLight = new THREE.HemisphereLight(0xff0000, 0x0000ff, 0.3)
-scene.add(hemisphereLight)
-hemisphereLight.visible = false
-pane.addInput(hemisphereLight,"visible",{
-    "label": "luz hemisphere",
-}).on("change",(ev)=>{
-    PARAMS.checkVisible()
-})
-
-const pointLight = new THREE.PointLight(0xff9000, 0.5)
-pointLight.position.set(1, 1, 1)
-scene.add(pointLight)
-pointLight.visible = false
-pointLight.castShadow = true
-pointLight.shadow.mapSize.width = 1024
-pointLight.shadow.mapSize.height = 1024
-
-pointLight.shadow.camera.near = 0.1
-pointLight.shadow.camera.far = 8
-
-const pointLightCameraHelper = new THREE.CameraHelper(pointLight.shadow.camera)
-scene.add(pointLightCameraHelper)
-pointLightCameraHelper.visible = false
-
-pane.addInput(pointLight,"visible",{
-    "label": "luz pontual",
-}).on("change",(ev)=>{
-    PARAMS.checkVisible()
-})
-
-const rectAreaLight = new THREE.RectAreaLight(0x4e00ff, 2, 1, 1)
-rectAreaLight.position.set(-1.5, 0, 1.5)
-rectAreaLight.lookAt(new THREE.Vector3())
-scene.add(rectAreaLight)
-
-rectAreaLight.visible = false
-pane.addInput(rectAreaLight,"visible",{
-    "label": "luz area",
-}).on("change",(ev)=>{
-    PARAMS.checkVisible()
-})
-
-const spotLight = new THREE.SpotLight(0x78ff00, 0.5, 10, Math.PI * 0.1, 0.25, 1)
-spotLight.position.set(0, 2, 3)
-spotLight.target.position.x = -0.75
-scene.add(spotLight.target)
-scene.add(spotLight)
-
-spotLight.visible = false
-spotLight.castShadow = true
-spotLight.shadow.mapSize.width = 1024
-spotLight.shadow.mapSize.height = 1024
-spotLight.shadow.camera.fov = 35
-spotLight.shadow.camera.near = 2
-spotLight.shadow.camera.far = 7
-
-
-const spotLightCameraHelper = new THREE.CameraHelper(spotLight.shadow.camera)
-scene.add(spotLightCameraHelper)
-spotLightCameraHelper.visible = false
-
-
-
-pane.addInput(spotLight,"visible",{
-    "label": "luz spot",
-}).on("change",(ev)=>{
-    PARAMS.checkVisible()
-})
-/** 
- * Helpers
- */
-
-const hemisphereLightHelper = new THREE.HemisphereLightHelper(hemisphereLight, 0.2)
-scene.add(hemisphereLightHelper)
-hemisphereLightHelper.visible = false
-
-const directionalLightHelper = new THREE.DirectionalLightHelper(directionalLight, 0.2)
-scene.add(directionalLightHelper)
-directionalLightHelper.visible = false
-
-
-const pointLightHelper = new THREE.PointLightHelper(pointLight, 0.2)
-scene.add(pointLightHelper)
-pointLightHelper.visible = false
-
-
-const spotLightHelper = new THREE.SpotLightHelper(spotLight)
-scene.add(spotLightHelper)
-spotLightHelper.visible = false
-
-const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight)
-scene.add(rectAreaLightHelper)
-rectAreaLightHelper.visible = false
-/**
- * Objects
- */
-// Material
-const material = new THREE.MeshStandardMaterial()
-material.roughness = 0.4
-
-// Objects
-
-const plane = new THREE.Mesh(
-    new THREE.PlaneGeometry(10, 10),
-    material
-)
-plane.rotation.x = - Math.PI * 0.5
-plane.position.y = - 0.65
-plane.receiveShadow = true
-
-
-scene.add(plane)
-
-/**
- * Sizes
- */
-const sizes = {
-    width: window.innerWidth,
-    height: window.innerHeight
+  }
 }
 
-window.addEventListener('resize', () =>
-{
-    // Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
+// Adicionar iluminação ambiente
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+ambientLight.intensity = 5.5;
+scene.add(ambientLight);
 
-    // Update camera
-    camera.aspect = sizes.width / sizes.height
-    camera.updateProjectionMatrix()
+// Adicionar luzes pontuais
+const light1 = new THREE.PointLight(0xff0000, 1, 10);
+light1.position.set(0, 0, 0);
+scene.add(light1);
 
-    // Update renderer
-    renderer.setSize(sizes.width, sizes.height)
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-})
+const light2 = new THREE.PointLight(0x00ff00, 1, 10);
+light2.position.set(0, 0, 0);
+scene.add(light2);
 
-/**
- * Camera
- */
-// Base camera
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height, 0.1, 100)
-camera.position.x = 4
-camera.position.y = 4
-camera.position.z = 9
-scene.add(camera)
+const light3 = new THREE.PointLight(0x0000ff, 1, 10);
+light3.position.set(0, 0, 0);
+light1.intensity = 4.0;
+light2.intensity = 3.5;
+light3.intensity = 4.8;
+scene.add(light1);
+scene.add(light2);
+scene.add(light3);
 
-// Controls
-const controls = new OrbitControls(camera, canvas)
-controls.enableDamping = true
+// Configurar o plano de fundo como uma cor sólida
+scene.background = new THREE.Color(0x0000ff);
 
-/**
- * Renderer
- */
-const renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
-    preserveDrawingBuffer: true,
-})
-renderer.setSize(sizes.width, sizes.height)
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
-renderer.shadowMap.enabled = true
-renderer.shadowMap.type = THREE.PCFSoftShadowMap
-/**
- * Animate
- */
-const clock = new THREE.Clock()
-let previousTime = 0
+// Carregar texturas
+const textureLoader = new THREE.TextureLoader();
+const texture1 = textureLoader.load('textures/texture1.jpg');
+const texture2 = textureLoader.load('textures/texture2.jpg');
+const texture3 = textureLoader.load('textures/texture3.jpg');
 
-const tick = () =>
-{
-    const elapsedTime = clock.getElapsedTime()
-    const deltaTime = elapsedTime - previousTime
-    previousTime = elapsedTime
+// Criar geometrias
+const geometry1 = new THREE.BoxGeometry();
+const geometry2 = new THREE.SphereGeometry();
+const geometry3 = new THREE.ConeGeometry();
 
-    // Update controls
-    controls.update()
+// Criar materiais com as texturas
+const material1 = new THREE.MeshPhongMaterial({ map: texture1 });
+const material2 = new THREE.MeshPhongMaterial({ map: texture2 });
+const material3 = new THREE.MeshPhongMaterial({ map: texture3 });
 
-    // Render
-    renderer.render(scene, camera)
+// Criar objetos com as geometrias e materiais
+const object1 = new THREE.Mesh(geometry1, material1);
+scene.add(object1);
 
-    // Call tick again on the next frame
-    window.requestAnimationFrame(tick)
+const object2 = new THREE.Mesh(geometry2, material2);
+scene.add(object2);
+
+const object3 = new THREE.Mesh(geometry3, material3);
+scene.add(object3);
+
+const object4 = new THREE.Mesh(geometry1, material1);
+scene.add(object4);
+
+const object5 = new THREE.Mesh(geometry2, material2);
+scene.add(object5);
+
+const object6 = new THREE.Mesh(geometry3, material3);
+scene.add(object6);
+
+const object7 = new THREE.Mesh(geometry1, material1);
+scene.add(object7);
+
+const object8 = new THREE.Mesh(geometry2, material2);
+scene.add(object8);
+
+const object9 = new THREE.Mesh(geometry3, material3);
+scene.add(object9);
+
+const object10 = new THREE.Mesh(geometry1, material1);
+scene.add(object10);
+
+const objects = [object1, object2, object3, object4, object5, object6, object7, object8, object9, object10];
+
+// Definir o raio da órbita
+const orbitRadius = 4;
+
+// Configurar animação
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Atualizar a posição dos objetos
+  const time = Date.now() * 0.001; // Tempo em segundos
+  const orbitSpeed = 0.5; // Velocidade da órbita
+  const angleIncrement = (Math.PI * 2) / objects.length; // Incremento do ângulo para cada objeto
+
+  for (let i = 0; i < objects.length; i++) {
+    const object = objects[i];
+    const angle = time * orbitSpeed + i * angleIncrement; // Ângulo atual da órbita
+
+    // Calcular a posição do objeto na órbita circular
+    const x = Math.cos(angle) * orbitRadius;
+    const z = Math.sin(angle) * orbitRadius;
+
+    object.position.set(x, 0, z);
+    object.rotation.y += 0.01; // Rotação do objeto em torno de seu próprio eixo
+  }
+
+  renderer.render(scene, camera);
 }
 
-tick()
+animate();

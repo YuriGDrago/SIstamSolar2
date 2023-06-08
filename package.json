@@ -14,5 +14,9 @@
     "gsap": "^3.5.1",
     "three": "^0.148.0",
     "tweakpane": "^3.1.9"
-  }
+  },
+  "description": "Download [Node.js](https://nodejs.org/en/download/).\r Run this followed commands:",
+  "main": "vite.config.js",
+  "author": "",
+  "license": "ISC"
 }
